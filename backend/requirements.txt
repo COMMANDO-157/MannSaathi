@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+streamlit
+langgraph
+langchain-core
+faiss-cpu
+faster-whisper
+transformers
+torch
+pydantic
+python-dotenv
