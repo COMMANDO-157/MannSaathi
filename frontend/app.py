@@ -1,8 +1,8 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="COMMAND-X", layout="wide")
-st.title("COMMAND-X — Emotional Wellbeing Companion")
+st.set_page_config(page_title="MannSaathi", layout="wide")
+st.title("MannSaathi — Emotional Wellbeing Companion")
 
 st.markdown("This is an assistive companion, not a diagnostic tool.")
 

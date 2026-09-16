@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from backend.graph import build_graph
 
-app = FastAPI(title="COMMAND-X")
+app = FastAPI(title="MannSaathi")
 pipeline = build_graph()
 
 class JournalRequest(BaseModel):
