@@ -26,8 +26,17 @@ def analysis_node(state: PipelineState) -> PipelineState:
     return state
 
 def knowledge_node(state: PipelineState) -> PipelineState:
-    # TODO: only call when tier warrants grounding
-    state["knowledge"] = None
+    tier_hint = state.get("reading", {})
+    # Only retrieve grounding content for mild/moderate — severe skips straight to crisis response
+    if tier_hint:
+        deviation = tier_hint.get("baseline_deviation", 0.0)
+        if deviation < 2.5:
+            result = knowledge_agent.retrieve(state["entry"]["text"])
+            state["knowledge"] = result.model_dump()
+        else:
+            state["knowledge"] = None
+    else:
+        state["knowledge"] = None
     return state
 
 def response_node(state: PipelineState) -> PipelineState:

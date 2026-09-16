@@ -9,3 +9,4 @@ transformers
 torch
 pydantic
 python-dotenv
+sentence-transformers

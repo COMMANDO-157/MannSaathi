@@ -22,13 +22,13 @@ def get_classifier():
         _classifier = pipeline(
             "text-classification",
             model="j-hartmann/emotion-english-distilroberta-base",
-            top_k=None,
+            top_k=None,  # return all 7 labels with scores, not just top-1
         )
     return _classifier
 
 def score_entry(entry: JournalEntry) -> tuple[float, float]:
     clf = get_classifier()
-    results = clf(entry.text)[0]
+    results = clf(entry.text)[0]  # list of {label, score} across all 7 emotions
 
     total_weight = sum(r["score"] for r in results)
     if total_weight == 0:

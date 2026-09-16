@@ -19,5 +19,5 @@ def determine_tier(reading: EmotionalReading) -> EscalationTier:
 def compose_response(tier: EscalationTier, knowledge: KnowledgeResult | None) -> str:
     base = f"[{tier.tier.upper()}] {tier.recommended_action}\nReasoning: {tier.reasoning}"
     if knowledge:
-        base += f"\nGrounded in: {', '.join(knowledge.sources)}"
+        base += f"\nGrounded in: {', '.join(knowledge['sources'])}"
     return base
