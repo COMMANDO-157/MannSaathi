@@ -47,6 +47,13 @@ def response_node(state: PipelineState) -> PipelineState:
     state["final_response"] = response_agent.compose_response(tier, state["knowledge"])
     return state
 
+def analyze_checkin_answer(user_id: str, text: str, history: list[float]) -> dict:
+    """Runs a single check-in answer through the existing pipeline, returns the reading only."""
+    from backend.models.schemas import JournalEntry
+    entry = JournalEntry(user_id=user_id, text=text, source="text")
+    reading = analysis_agent.analyze(entry, history)
+    return reading.model_dump()
+
 def build_graph():
     graph = StateGraph(PipelineState)
     graph.add_node("interaction", interaction_node)

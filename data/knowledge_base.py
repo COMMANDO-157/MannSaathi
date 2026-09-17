@@ -12,3 +12,32 @@ KNOWLEDGE_BASE = [
     ("Sleep disruption often accompanies emotional distress. Keeping a consistent sleep schedule, even during stressful periods, supports emotional regulation.", "Sleep and Emotional Health Guide"),
     ("Gratitude practices, such as writing down three things that went well each day, have been linked to modest but consistent improvements in mood over time.", "Positive Psychology Practices"),
 ]
+
+CRISIS_RESOURCES = {
+    "helplines": [
+        {
+            "name": "Tele-MANAS (Govt. of India)",
+            "number": "14416",
+            "alt_number": "1-800-891-4416",
+            "availability": "24/7, free, confidential",
+            "note": "Available in 20 languages. Connects to a trained counsellor; can refer to a psychiatrist if needed.",
+        },
+        {
+            "name": "iCall (TISS)",
+            "number": "9152987821",
+            "availability": "Mon-Sat, 8 AM - 10 PM",
+            "note": "Free psychosocial support helpline run by the Tata Institute of Social Sciences.",
+        },
+        {
+            "name": "National Emergency Number",
+            "number": "112",
+            "availability": "24/7",
+            "note": "For immediate physical safety emergencies.",
+        },
+    ],
+    "message": (
+        "It sounds like things feel really heavy right now. You don't have to go through this alone — "
+        "please consider reaching out to Tele-MANAS at 14416, a free, confidential, government-run helpline "
+        "available 24/7 in your language. If you're in immediate danger, please call 112."
+    ),
+}

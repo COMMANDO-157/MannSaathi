@@ -6,3 +6,4 @@ venv/
 *.faiss
 .streamlit/
 .DS_Store
+mannsaathi.db
