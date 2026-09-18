@@ -1,6 +1,7 @@
 import streamlit as st
 import tempfile, os, sys
 from datetime import datetime
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -13,32 +14,51 @@ from backend.agents.voice_agent import text_to_speech
 from backend.agents.question_agent import generate_next_question
 from backend.db import save_journal_entry, get_journal_entries, get_valence_history, save_checkin, get_checkin_streak
 
-st.set_page_config(page_title="MannSaathi", layout="wide")
+st.set_page_config(page_title="MannSaathi · A moment for you", page_icon="🌱", layout="wide")
+st.html(Path(__file__).with_name("styles.css"))
+st.html('''<div class="ms-brand"><div class="ms-mark" aria-hidden="true">✳</div>
+MannSaathi <span>Your emotional wellbeing companion</span></div>''')
+
+
+def render_hero(title, description):
+    # Only static presentation copy is passed here, never journal content.
+    st.html(f'''<section class="ms-hero"><div class="ms-orbit" aria-hidden="true"></div>
+    <div class="ms-eyebrow">A little space. Just for you.</div>
+    <h1>{title}</h1><p>{description}</p></section>''')
+
+
 if "onboarded" not in st.session_state:
     st.session_state.onboarded = False
 
 if not st.session_state.onboarded:
-    st.title("Welcome to MannSaathi 🌱")
+    render_hero("Every feeling deserves<br>a little room.",
+                "Welcome to MannSaathi. A quiet place to reflect, check in with yourself, and take your day one moment at a time.")
     st.markdown("""
     **Before we begin, here's what this companion does — and doesn't do:**
 
-    ✅ Listens to your voice or text journal entries and understands how you're feeling
-    ✅ Notices when your emotional pattern shifts from your own recent baseline
-    ✅ Points you toward grounded, cited coping suggestions — or real human help when needed
+    - Listens to your voice or text journal entries and understands how you're feeling
+    - Notices when your emotional pattern shifts from your own recent baseline
+    - Points you toward grounded, cited coping suggestions — or real human help when needed
 
-    ❌ It does **not** diagnose any mental health condition
-    ❌ It is **not** a replacement for a therapist, doctor, or counselor
-    ❌ Nothing is shared with anyone — this stays within your own session
+    It does **not** diagnose any mental health condition.
+
+    It is **not** a replacement for a therapist, doctor, or counselor.
+
+    **Demo privacy:** Use fictional entries. Entries are stored on the server, and anyone
+    using the same User ID can view that history. User IDs are not passwords.
+    Guided check-in answers may be sent to Groq for follow-up questions, and spoken
+    question/summary text is sent to Google's text-to-speech service.
 
     If at any point you're in crisis, this companion will always show you real, verified helplines.
     """)
-    if st.button("I understand — let's begin"):
+    if st.button("I understand — let's begin", type="primary"):
         st.session_state.onboarded = True
         st.rerun()
     st.stop()
 
-st.title("MannSaathi — Emotional Wellbeing Companion")
-st.markdown("This is an assistive companion, not a diagnostic tool.")
+render_hero("Come as you are.", "Write it out, talk it through, or simply check in. There's no perfect way to begin — just your own.")
+st.caption("This is an assistive companion, not a diagnostic tool.")
+st.info("Demo: use fictional entries only. History is shared by User ID; a User ID is not a private account.")
 
 if "pipeline" not in st.session_state:
     st.session_state.pipeline = build_graph()
@@ -80,17 +100,20 @@ user_id = st.text_input("User ID", value="demo_user")
 tab_journal, tab_checkin, tab_history = st.tabs(["📓 Journal", "💬 Emotional Check-In", "📈 History"])
 
 with tab_journal:
+    st.subheader("A moment to put it into words")
     st.caption("Free-form writing — say whatever's on your mind, like a diary.")
-    entry_text = st.text_area("How are you feeling today?", key="journal_text")
-    if st.button("Submit journal entry"):
-        result = run_pipeline(user_id, entry_text, "text")
+    entry_text = st.text_area("How are you feeling today?", key="journal_text", height=190,
+                              placeholder="Today, what's on my mind is…")
+    if st.button("Submit journal entry", type="primary"):
+        with st.spinner("Taking a moment with your words…"):
+            result = run_pipeline(user_id, entry_text, "text")
         render_result(result)
 
     
     st.divider()
     st.subheader("Or record a voice entry")
     audio_value = st.audio_input("Record your check-in")
-    if audio_value is not None and st.button("Submit voice entry"):
+    if audio_value is not None and st.button("Submit voice entry", type="primary"):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
             tmp.write(audio_value.getvalue())
             tmp_path = tmp.name
@@ -112,6 +135,7 @@ with tab_journal:
         st.info("No journal entries yet.")
 
 with tab_checkin:
+    st.subheader("Let's take this one question at a time")
     st.caption("A short guided conversation to understand how you're really feeling — your answers are analyzed quietly in the background.")
 
     if "checkin_state" not in st.session_state:
@@ -140,7 +164,8 @@ with tab_checkin:
         audio_bytes = text_to_speech(state["current_q"])
         st.audio(audio_bytes, format="audio/mp3", autoplay=True)
 
-        answer_text = st.text_area("Your answer (or record below)", key=f"checkin_answer_{len(state['answers'])}")
+        answer_text = st.text_area("Your answer (or record below)", key=f"checkin_answer_{len(state['answers'])}", height=150,
+                                   placeholder="Take your time. Whatever comes to mind is a place to start.")
 
         voice_answer = st.audio_input("Or answer by voice", key=f"checkin_voice_{len(state['answers'])}")
         if voice_answer is not None:
@@ -156,7 +181,7 @@ with tab_checkin:
 
         answer = answer_text
 
-        if st.button("Next →", key="checkin_next"):
+        if st.button("Next →", key="checkin_next", type="primary"):
             if answer and answer.strip():               
                 history = get_valence_history(user_id)
                 reading = analyze_checkin_answer(user_id, answer, history)
@@ -215,6 +240,8 @@ with tab_checkin:
             st.rerun()
 
 with tab_history:
+    st.subheader("Your reflections, over time")
+    st.caption("A place to look back at what you've shared and notice your own patterns.")
     st.subheader("Valence trend (from journal entries)")
     history = get_valence_history(user_id)
     if history:
@@ -247,3 +274,5 @@ with tab_history:
         )
     else:
         st.info("No entries yet to export.")
+
+st.html('<footer class="ms-footer">MannSaathi · A little reflection, at your own pace.</footer>')

@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 venv/
 *.faiss
-.streamlit/
+.streamlit/*
+!.streamlit/config.toml
 .DS_Store
 mannsaathi.db

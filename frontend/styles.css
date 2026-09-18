@@ -1,0 +1,30 @@
+/* Presentation only. Native Streamlit controls retain their semantics. */
+.stMainBlockContainer { max-width: 1120px; padding-top: 4.5rem; padding-bottom: 4rem; }
+.ms-brand { display:flex; align-items:center; gap:12px; margin-bottom:24px; color:#254c40; font-weight:700; font-size:22px; letter-spacing:-.6px; }
+.ms-brand span { font-size:11px; letter-spacing:2px; font-weight:500; margin-left:auto; text-transform:uppercase; }
+.ms-mark { display:grid; place-items:center; width:38px; height:38px; background:#e0eadd; border-radius:14px; font-size:25px; }
+.ms-hero { position:relative; overflow:hidden; padding:40px; border:1px solid #d8e2d5; border-radius:28px; background:linear-gradient(115deg,#edf2e8,#f7f5ec); margin-bottom:24px; animation:ms-arrive .65s ease-out both; }
+.ms-eyebrow { color:#4c6557; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2.3px; margin-bottom:15px; }
+.ms-hero h1 { color:#254c40; font-family:Georgia,serif; font-weight:400; font-size:clamp(32px,4.7vw,54px); line-height:1.13; max-width:680px; letter-spacing:-1.6px; padding:0; margin:0 0 18px; position:relative; z-index:1; }
+.ms-hero p { color:#4c6557; max-width:570px; line-height:1.7; margin:0; position:relative; z-index:1; }
+.ms-orbit { position:absolute; right:-70px; top:-90px; width:330px; height:330px; border-radius:50%; border:1px solid #a6b99b66; pointer-events:none; animation:ms-breathe 9s ease-in-out 2; }
+.ms-orbit::before,.ms-orbit::after { content:""; position:absolute; border:1px solid #a6b99b66; border-radius:50%; inset:30px; }
+.ms-orbit::after { inset:65px; background:#dce7ce55; }
+.ms-note { padding:20px 24px; border-left:3px solid #9bad87; background:#f0f2e9; border-radius:0 14px 14px 0; color:#4c6557; margin:12px 0 24px; line-height:1.7; }
+.ms-note strong { color:#254c40; }
+.ms-footer { color:#58685e; font-size:12px; text-align:center; padding-top:36px; }
+[data-testid="stTabs"] [role="tablist"] { gap:8px; padding:6px; border-radius:16px; background:#eaf0e5; }
+[data-testid="stTabs"] [role="tab"] { border-radius:11px; padding:12px 20px; height:auto; transition:background .2s ease, color .2s ease; }
+[data-testid="stTabs"] [role="tab"][aria-selected="true"] { background:#fffdf8; color:#254c40; box-shadow:0 2px 8px #254c4010; }
+[data-testid="stTabs"] [role="tabpanel"] { padding-top:24px; }
+[data-testid="stButton"] button,[data-testid="stDownloadButton"] button { min-height:46px; transition:transform .18s ease,box-shadow .18s ease; }
+[data-testid="stButton"] button:hover,[data-testid="stDownloadButton"] button:hover { transform:translateY(-2px); box-shadow:0 5px 12px #254c4018; }
+[data-testid="stButton"] button:active { transform:translateY(0); }
+button:focus-visible { outline:3px solid #72865e !important; outline-offset:3px; }
+[data-testid="stTextArea"] textarea { line-height:1.8; }
+[data-testid="stMetric"] { padding:20px; border:1px solid #d8e2d5; border-radius:16px; background:#fffdf8; }
+[data-testid="stProgress"] [role="progressbar"] { transition:width .4s ease; }
+@keyframes ms-arrive { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes ms-breathe { 0%,100% { transform:scale(.94); opacity:.65; } 50% { transform:scale(1.06); opacity:1; } }
+@media(max-width:640px) { .ms-hero { padding:28px 22px; } .ms-brand span { display:none; } .ms-orbit { right:-230px; } [data-testid="stTabs"] [role="tab"] { padding:10px 9px; } .stMainBlockContainer { padding-left:18px; padding-right:18px; } }
+@media(prefers-reduced-motion:reduce) { .ms-hero,.ms-orbit { animation:none; } [data-testid="stButton"] button,[data-testid="stDownloadButton"] button,[data-testid="stTabs"] [role="tab"],[data-testid="stProgress"] [role="progressbar"] { transition:none; transform:none; } }

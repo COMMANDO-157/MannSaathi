@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-streamlit
+streamlit==1.64.0
 langgraph
 langchain-core
 faiss-cpu
