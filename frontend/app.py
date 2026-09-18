@@ -14,6 +14,29 @@ from backend.agents.question_agent import generate_next_question
 from backend.db import save_journal_entry, get_journal_entries, get_valence_history, save_checkin, get_checkin_streak
 
 st.set_page_config(page_title="MannSaathi", layout="wide")
+if "onboarded" not in st.session_state:
+    st.session_state.onboarded = False
+
+if not st.session_state.onboarded:
+    st.title("Welcome to MannSaathi 🌱")
+    st.markdown("""
+    **Before we begin, here's what this companion does — and doesn't do:**
+
+    ✅ Listens to your voice or text journal entries and understands how you're feeling
+    ✅ Notices when your emotional pattern shifts from your own recent baseline
+    ✅ Points you toward grounded, cited coping suggestions — or real human help when needed
+
+    ❌ It does **not** diagnose any mental health condition
+    ❌ It is **not** a replacement for a therapist, doctor, or counselor
+    ❌ Nothing is shared with anyone — this stays within your own session
+
+    If at any point you're in crisis, this companion will always show you real, verified helplines.
+    """)
+    if st.button("I understand — let's begin"):
+        st.session_state.onboarded = True
+        st.rerun()
+    st.stop()
+
 st.title("MannSaathi — Emotional Wellbeing Companion")
 st.markdown("This is an assistive companion, not a diagnostic tool.")
 
@@ -38,13 +61,14 @@ def run_pipeline(user_id, text, source):
 def render_result(result, transcribed=None):
     reading = result["reading"]
     tier_name = result["tier"]["tier"]
+    confidence = result["tier"]["confidence"]
     if transcribed:
         st.info(f"Transcribed: \"{transcribed}\"")
     if tier_name == "severe":
-        st.error(f"Tier: {tier_name.upper()}")
+        st.error(f"Tier: {tier_name.upper()} (confidence: {confidence:.0%})")
         st.markdown(result["final_response"])
     else:
-        st.subheader(f"Tier: {tier_name.upper()}")
+        st.subheader(f"Tier: {tier_name.upper()} (confidence: {confidence:.0%})")
         st.write(result["final_response"])
     col1, col2, col3 = st.columns(3)
     col1.metric("Valence", f"{reading['valence_score']:.3f}")
@@ -62,11 +86,7 @@ with tab_journal:
         result = run_pipeline(user_id, entry_text, "text")
         render_result(result)
 
-    st.info("Would you like to do a quick emotional check-in too?")
-    if st.button("Start check-in", key="nudge_checkin"):
-            st.session_state.active_tab_hint = "checkin"
-            st.rerun()
-
+    
     st.divider()
     st.subheader("Or record a voice entry")
     audio_value = st.audio_input("Record your check-in")
@@ -207,3 +227,23 @@ with tab_history:
     if clog:
         st.subheader("Mood trend (from check-ins)")
         st.line_chart([c["mood"] for c in clog])
+        st.divider()
+
+    st.subheader("Export session summary")
+    entries = get_journal_entries(user_id, limit=50)
+    if entries:
+        summary_lines = [f"MannSaathi Session Summary — {user_id}", "=" * 40, ""]
+        for e in reversed(entries):
+            summary_lines.append(f"[{e['time']}] Tier: {e['tier'].upper()} (valence {e['valence']:.2f})")
+            summary_lines.append(f"  \"{e['text']}\"")
+            summary_lines.append("")
+        summary_text = "\n".join(summary_lines)
+
+        st.download_button(
+            "📄 Download session summary (for a therapist or trusted person)",
+            data=summary_text,
+            file_name=f"mannsaathi_summary_{user_id}.txt",
+            mime="text/plain",
+        )
+    else:
+        st.info("No entries yet to export.")

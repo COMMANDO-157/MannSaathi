@@ -12,3 +12,5 @@ python-dotenv
 sentence-transformers
 groq
 gTTS
+scikit-learn
+datasets
